@@ -5,20 +5,18 @@ export default {
   name: 'App',
   data(){
     return {
+      api_key: "d91286fc80b430ec00c093043a7689d8",
       movies: [], 
-      image: 'https://api.themoviedb.org/3/configuration&',
+      image: 'https://image.tmdb.org/t/p/w780/',
       searchMovie: ''
     }
   },
   components: {
     AppHeader
   },
-  mounted() {
-    axios.get ('https://api.themoviedb.org/3/discover/movie', {
-      headers: {
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkOTEyODZmYzgwYjQzMGVjMDBjMDkzMDQzYTc2ODlkOCIsInN1YiI6IjY2MDcyOTNkOGEwZTliMDE3YzRkYWFjMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-9d58jzGjZ-xwHoqGheDr2mBup6cqJAyjQK3srHGmvk'
-      }
-    })
+  methods: {
+    getMovies() {
+      axios.get ('https://api.themoviedb.org/3/search/movie?api_key=' + this.api_key + '&query=' + this.searchMovie)
     .then(response => {
       console.log(response.data);
       console.log(response.data.results);
@@ -28,6 +26,26 @@ export default {
     .catch(error => {
       console.error(error);
     })
+    }
+  },
+  mounted() {
+    this.getMovies();
+    /* axios.get ('https://api.themoviedb.org/3/search/movie?api_key=' + this.api_key + '&query=' + this.searchMovie 
+    {
+      headers: {
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkOTEyODZmYzgwYjQzMGVjMDBjMDkzMDQzYTc2ODlkOCIsInN1YiI6IjY2MDcyOTNkOGEwZTliMDE3YzRkYWFjMiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.-9d58jzGjZ-xwHoqGheDr2mBup6cqJAyjQK3srHGmvk'
+      }
+    }
+    )
+    .then(response => {
+      console.log(response.data);
+      console.log(response.data.results);
+      console.log(this);
+      this.movies = response.data.results;
+    })
+    .catch(error => {
+      console.error(error);
+    }) */
   }
 }
 </script>
@@ -37,15 +55,15 @@ export default {
   <AppHeader></AppHeader>
 
 <div class="search_bar">
-  <input type="text" name="searchMovie" placeholder="Type the name of a movie to search" v-model="searchMovie">
+  <input @keyup.enter="getMovies()" type="text" name="searchMovie" placeholder="Type the name of a movie to search" v-model="searchMovie">
 
-  <button @click="$emit('searched', [searchMovie])">Search</button>
+  <button @click="getMovies()">Search</button>
 </div>
 
 
-  <div>
+  <div class="flex">
     <div class="movie" v-for="movie in movies">
-      <img :src="movie.image.poster_path" alt="movie poster">
+      <img :src="image + movie.poster_path" alt="movie poster" width="200px">
       <h3>{{ movie.title }}</h3>
       <h4>{{ movie.original_title }}</h4>
       <h5>{{ movie.original_language }}</h5>
@@ -56,6 +74,11 @@ export default {
 </template>
 
 <style>
+
+.flex{
+  display: flex;
+  flex-wrap: wrap;
+}
 
 .search_bar{
   margin-top: 1rem;
